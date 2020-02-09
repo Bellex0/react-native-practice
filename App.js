@@ -1,8 +1,40 @@
 import React from 'react';
 import { Image,  StyleSheet, Text,  TouchableOpacity, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import logo from './assets/bp.png'
 
 export default function App() {
+
+  let [selectedImage, setSelectedImage] = React.useState(null);
+
+  let openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+
+    if (pickerResult.cancelled === true) {
+      return;
+    }
+    setSelectedImage({ localUri: pickerResult.uri });
+  };
+  if (selectedImage !== null) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={{ uri: selectedImage.localUri }}
+          style={styles.thumbnail}
+        />
+      </View>
+    );
+  }
+  
+
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.instructions}> Hey You</Text>
@@ -10,9 +42,9 @@ export default function App() {
 
 
       <TouchableOpacity
-        onPress={() => alert('Hello, world!')}
-        style={{ backgroundColor: 'blue' }}>
-        <Text style={{ fontSize: 20, color: '#fff' }}>Pick a photo</Text>
+        onPress={openImagePickerAsync} 
+        style={styles.button}>
+        <Text style={styles.buttonText}>Pick a photo</Text>
       </TouchableOpacity>
 
 
@@ -38,4 +70,19 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  button: {
+    marginTop: 10,
+    backgroundColor: "blue", 
+    padding: 20, 
+    borderRadius: 5
+  }, 
+  buttonText: {
+    fontSize: 20,
+    color: '#fff'
+  },
+  thumbnail: {
+    width: 300,
+    height: 300,
+    resizeMode: "contain"
+  }
 });
