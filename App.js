@@ -1,7 +1,8 @@
 import React from 'react';
 import { Image,  StyleSheet, Text,  TouchableOpacity, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import logo from './assets/bp.png'
+import * as Sharing from 'expo-sharing';
+import logo from './assets/logo.png'
 
 export default function App() {
 
@@ -21,6 +22,16 @@ export default function App() {
     }
     setSelectedImage({ localUri: pickerResult.uri });
   };
+
+  let openShareDialogAsync = async () => {
+    if (!(await Sharing.isAvailableAsync())) {
+      alert(`Uh oh, sharing isn't available on your platform`);
+      return;
+    }
+
+    Sharing.shareAsync(selectedImage.localUri);
+  };
+
   if (selectedImage !== null) {
     return (
       <View style={styles.container}>
@@ -28,17 +39,19 @@ export default function App() {
           source={{ uri: selectedImage.localUri }}
           style={styles.thumbnail}
         />
+
+<TouchableOpacity onPress={openShareDialogAsync} style={styles.button}>
+          <Text style={styles.buttonText}>Share this photo</Text>
+        </TouchableOpacity>
       </View>
     );
   }
   
 
-
-
   return (
     <View style={styles.container}>
-      <Text style={styles.instructions}> Hey You</Text>
       <Image source={logo} style={styles.logo} /> 
+      <Text style={styles.instructions}> Share some pix! </Text>
 
 
       <TouchableOpacity
@@ -46,8 +59,6 @@ export default function App() {
         style={styles.button}>
         <Text style={styles.buttonText}>Pick a photo</Text>
       </TouchableOpacity>
-
-
     </View>
   );
 }
@@ -61,7 +72,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: 305,
-    height: 159
+    height: 400
   },
   instructions: {
     color: 'deeppink',
